@@ -35,9 +35,7 @@ const Home: React.FC = () => {
     }
 
   }
-
-  // console.log(LanguageColors['php']);
-
+  
   return (
     <View style={styles.mainContainer}>
       <SearchBar 
