@@ -14,6 +14,29 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         backgroundColor: '#eee',
         borderRadius: 10
+    },
+    reposContainerTitle: {
+        fontSize: 20,
+        marginTop: 20,
+        textAlign: 'center',
+    },
+    reposList: {
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    reposContainer: {
+        width: '100%',
+        justifyContent: 'center',
+        marginBottom: 200
+    },
+    repository: {
+        flexDirection: 'row',
+        padding: 20,
+        borderRadius: 10,
+        alignItems: 'center',
+        margin: 5,
+        width: '90%',
+        backgroundColor: '#eee'
     }
 });
 

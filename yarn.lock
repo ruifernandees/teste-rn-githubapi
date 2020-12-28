@@ -3500,6 +3500,13 @@ klaw@^1.0.0:
   optionalDependencies:
     graceful-fs "^4.1.9"
 
+language-colors@^1.184.0:
+  version "1.184.0"
+  resolved "https://registry.yarnpkg.com/language-colors/-/language-colors-1.184.0.tgz#af7d2ba746a93096f229d143c967263390a73432"
+  integrity sha512-jKPaW9VMsxMXTTrs0XnIaT0viZ04WF0Oo+cV8JDH0gF7uoHY+x++2F2VpqN2CTcPCLPyEOcxGr8RveqPC8qG2g==
+  dependencies:
+    color "^3.1.2"
+
 leven@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/leven/-/leven-3.1.0.tgz#77891de834064cccba82ae7842bb6b14a13ed7f2"

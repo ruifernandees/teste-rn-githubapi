@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Text, View } from 'react-native';
+import { Image, Linking, Text, View } from 'react-native';
 import { SearchBar } from 'react-native-elements';
-import { RectButton } from 'react-native-gesture-handler';
+import { RectButton, ScrollView } from 'react-native-gesture-handler';
+
+import LanguageColors from 'language-colors';
 
 import IGithubRepo from './IGithubRepo';
 
@@ -11,6 +13,7 @@ const Home: React.FC = () => {
 
   const [text, setText] = useState('');
   const [repositories, setRepositories] = useState<IGithubRepo[]>([]);
+  const [errorMessage, setErrorMessage] = useState('');
 
   function handleChangeText(textFromEvent: string) {
     setText(textFromEvent);
@@ -24,8 +27,16 @@ const Home: React.FC = () => {
     const response = await fetch(`https://api.github.com/users/${text}/repos`);
     const repos = await response.json();
 
-    setRepositories(repos);
+    if (repos.message) {
+      setRepositories([]);
+      setErrorMessage('Usuário não encontrado!');
+    } else {
+      setRepositories(repos);
+    }
+
   }
+
+  // console.log(LanguageColors['php']);
 
   return (
     <View style={styles.mainContainer}>
@@ -42,6 +53,7 @@ const Home: React.FC = () => {
           borderTopColor: "transparent",
           width: '100%'
         }}
+        autoCapitalize='none'
         inputContainerStyle={{
           backgroundColor: "#eee",
         }}
@@ -57,15 +69,92 @@ const Home: React.FC = () => {
         <Text>Pesquisar</Text>
       </RectButton>
 
-      <View>
-        {
-          repositories.map((repo: IGithubRepo) => {
-            return (
-              <Text key={repo.name}>{repo.name}</Text>
-            );
-          })
-        }
-      </View>
+      {
+        <Text>{errorMessage}</Text>
+      }
+      
+      {
+        (repositories.length > 0) &&
+        <View style={styles.reposContainer}>
+          <Text style={styles.reposContainerTitle}>Repositórios de {repositories[0].owner.login}:</Text>
+          <ScrollView contentContainerStyle={styles.reposList}>
+            {
+              repositories.map((repo: IGithubRepo) => {
+                let languageName = null;
+                let color = null;
+                
+                if (repo.language) {
+                  languageName = repo.language
+                  .toLowerCase()
+                  .replace(' ', '_');
+
+                  color = LanguageColors[languageName].color;
+                }
+
+                return (
+                  <RectButton 
+                    style={styles.repository}
+                    key={repo.name}
+                    onPress={() => Linking.openURL(repo.html_url)}
+                  >
+                    <Image 
+                      source={{
+                        uri: repo.owner.avatar_url
+                      }} 
+                      style={{
+                        width: 20,
+                        height: 20,
+                        marginRight: 10,
+                        borderRadius: 10
+                      }}
+                    />
+                    <View>
+                      <Text
+                        style={{
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {repo.name}
+                      </Text>
+                      <Text 
+                        style={{
+                          color: '#444'
+                        }}
+                      >
+                        {repo.description ?? 'Sem descrição'}
+                      </Text>
+                      
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center'
+                        }}
+                      >
+                        <View 
+                          style={{
+                            width: 15,
+                            height: 15,
+                            borderRadius: 50,
+                            marginRight: 5,
+                            backgroundColor: color ? `rgb(${color[0]}, ${color[1]}, ${color[2]})` : '#fff'
+                          }}
+                        />
+                        <Text
+                          style={{
+                            color: '#444'
+                          }}
+                        >
+                          {repo.language ?? 'Sem linguagem'}
+                        </Text>
+                      </View>
+                    </View>
+                  </RectButton>
+                );
+              })
+            }
+          </ScrollView>
+        </View>
+      }
     </View>
   );
 };
