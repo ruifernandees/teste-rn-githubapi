@@ -32,6 +32,7 @@ const Home: React.FC = () => {
       setErrorMessage('Usuário não encontrado!');
     } else {
       setRepositories(repos);
+      setErrorMessage('');
     }
 
   }
