@@ -27,31 +27,31 @@ const Home: React.FC = () => {
   }
 
   async function handleSearch() {
-    Keyboard.dismiss();
     const response = await fetch(`https://api.github.com/users/${text}/repos`);
     const repos = await response.json();
-
+    
     if (repos.message) {
       setRepositories([]);
       setErrorMessage('Usuário não encontrado!');
-
+      
       const errorTextTag = findNodeHandle(errorText.current);
-
+      
       if (errorTextTag) {
         AccessibilityInfo.setAccessibilityFocus(errorTextTag);
       }
-
+      
     } else {
       setRepositories(repos);
       setErrorMessage('');
-
+      
       const titleRepositoriesTag = findNodeHandle(titleRepositories.current);
-
+      
       if (titleRepositoriesTag) {
         AccessibilityInfo.setAccessibilityFocus(titleRepositoriesTag);
       }
     }
-
+    
+    Keyboard.dismiss();
   }
   
   return (
