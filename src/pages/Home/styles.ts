@@ -36,7 +36,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         margin: 5,
         width: '90%',
-        backgroundColor: '#eee'
+        backgroundColor: '#eee',
+        paddingBottom: 15,
+        paddingTop: 15
     }
 });
 

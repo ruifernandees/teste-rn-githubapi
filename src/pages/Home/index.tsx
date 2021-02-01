@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Image, Linking, Text, View } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { AccessibilityInfo, findNodeHandle, Image, Keyboard, Linking, Text, View } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 
@@ -15,6 +15,9 @@ const Home: React.FC = () => {
   const [repositories, setRepositories] = useState<IGithubRepo[]>([]);
   const [errorMessage, setErrorMessage] = useState('');
 
+  const errorText = useRef(null);
+  const titleRepositories = useRef(null);
+
   function handleChangeText(textFromEvent: string) {
     setText(textFromEvent);
   }
@@ -24,15 +27,29 @@ const Home: React.FC = () => {
   }
 
   async function handleSearch() {
+    Keyboard.dismiss();
     const response = await fetch(`https://api.github.com/users/${text}/repos`);
     const repos = await response.json();
 
     if (repos.message) {
       setRepositories([]);
       setErrorMessage('Usuário não encontrado!');
+
+      const errorTextTag = findNodeHandle(errorText.current);
+
+      if (errorTextTag) {
+        AccessibilityInfo.setAccessibilityFocus(errorTextTag);
+      }
+
     } else {
       setRepositories(repos);
       setErrorMessage('');
+
+      const titleRepositoriesTag = findNodeHandle(titleRepositories.current);
+
+      if (titleRepositoriesTag) {
+        AccessibilityInfo.setAccessibilityFocus(titleRepositoriesTag);
+      }
     }
 
   }
@@ -65,17 +82,29 @@ const Home: React.FC = () => {
         style={styles.searchButton}
         onPress={handleSearch}
       >
-        <Text>Pesquisar</Text>
+        <View accessible>
+          <Text accessible={true}>Pesquisar</Text>
+        </View>
       </RectButton>
 
       {
-        <Text>{errorMessage}</Text>
+        <Text
+          accessible={true}
+          ref={errorText} 
+        >
+          {errorMessage}
+        </Text>
       }
       
       {
         (repositories.length > 0) &&
         <View style={styles.reposContainer}>
-          <Text style={styles.reposContainerTitle}>Repositórios de {repositories[0].owner.login}:</Text>
+          <Text 
+            style={styles.reposContainerTitle}
+            ref={titleRepositories}
+          >
+            Repositórios de {repositories[0].owner.login}:
+          </Text>
           <ScrollView contentContainerStyle={styles.reposList}>
             {
               repositories.map((repo: IGithubRepo) => {
@@ -92,59 +121,72 @@ const Home: React.FC = () => {
 
                 return (
                   <RectButton 
-                    style={styles.repository}
                     key={repo.name}
                     onPress={() => Linking.openURL(repo.html_url)}
+                    style={styles.repository}
                   >
-                    <Image 
-                      source={{
-                        uri: repo.owner.avatar_url
-                      }} 
+                    <View
+                      accessible
                       style={{
-                        width: 20,
-                        height: 20,
-                        marginRight: 10,
-                        borderRadius: 10
+                        flexDirection: 'row',
+                        width: '100%',
+                        alignItems: 'center'
                       }}
-                    />
-                    <View>
-                      <Text
+                    >
+                      <Image 
+                        source={{
+                          uri: repo.owner.avatar_url
+                        }} 
                         style={{
-                          fontWeight: 'bold'
+                          width: 20,
+                          height: 20,
+                          marginRight: 10,
+                          borderRadius: 10
                         }}
-                      >
-                        {repo.name}
-                      </Text>
-                      <Text 
-                        style={{
-                          color: '#444'
-                        }}
-                      >
-                        {repo.description ?? 'Sem descrição'}
-                      </Text>
-                      
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center'
-                        }}
-                      >
-                        <View 
-                          style={{
-                            width: 15,
-                            height: 15,
-                            borderRadius: 50,
-                            marginRight: 5,
-                            backgroundColor: color ? `rgb(${color[0]}, ${color[1]}, ${color[2]})` : '#fff'
-                          }}
-                        />
+                        accessible={true}
+                      />
+                      <View>
                         <Text
+                          style={{
+                            fontWeight: 'bold'
+                          }}
+                          accessible={true}
+                        >
+                          {repo.name}
+                        </Text>
+                        <Text 
                           style={{
                             color: '#444'
                           }}
+                          accessible={true}
                         >
-                          {repo.language ?? 'Sem linguagem'}
+                          {repo.description ?? 'Sem descrição'}
                         </Text>
+                        
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center'
+                          }}
+                        >
+                          <View 
+                            style={{
+                              width: 15,
+                              height: 15,
+                              borderRadius: 50,
+                              marginRight: 5,
+                              backgroundColor: color ? `rgb(${color[0]}, ${color[1]}, ${color[2]})` : '#fff'
+                            }}
+                          />
+                          <Text
+                            style={{
+                              color: '#444'
+                            }}
+                            accessible={true}
+                          >
+                            {repo.language ?? 'Sem linguagem'}
+                          </Text>
+                        </View>
                       </View>
                     </View>
                   </RectButton>
